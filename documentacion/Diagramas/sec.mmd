@@ -1,0 +1,23 @@
+sequenceDiagram
+  autonumber
+  participant App as App / Cliente
+  participant F as ApiSecurityFilter
+  participant A as AuthController + AuthService
+  participant BD as MySQL
+  App->>F: POST /api/login {usuario, clave}
+  F->>A: ruta pública, pasa sin token
+  A->>BD: busca por usuario o correo
+  A->>A: BCrypt.checkpw + control de intentos
+  A-->>App: 200 {token JWT, expiraEnSegundos, usuario}
+  Note over App: guarda el token
+  App->>F: GET /api/mascotas  Authorization: Bearer token
+  F->>F: valida firma, emisor y expiración
+  F->>F: token no revocado?
+  F->>BD: cuenta sigue activa?
+  F->>F: Permisos: rol + método + ruta
+  F->>A: autorizado, ejecuta el controlador
+  A-->>App: 200 JSON
+  App->>F: POST /api/logout
+  F-->>App: 200 y el jti queda revocado
+  App->>F: GET /api/me con el mismo token
+  F-->>App: 401 TOKEN_REVOCADO

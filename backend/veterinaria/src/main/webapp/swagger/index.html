@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>VetCare API - Swagger</title>
+<link rel="stylesheet" href="swagger-ui.css"><link rel="icon" href="favicon-32x32.png"></head>
+<body><div id="swagger-ui"></div>
+<script src="swagger-ui-bundle.js"></script><script src="swagger-ui-standalone-preset.js"></script>
+<script>
+window.onload=function(){
+  window.ui=SwaggerUIBundle({url:"openapi.json",dom_id:"#swagger-ui",deepLinking:true,
+    persistAuthorization:true,presets:[SwaggerUIBundle.presets.apis,SwaggerUIStandalonePreset],layout:"StandaloneLayout"});
+};
+</script></body></html>

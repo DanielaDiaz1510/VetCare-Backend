@@ -1,0 +1,5281 @@
+{
+ "openapi": "3.0.3",
+ "info": {
+  "title": "VetCare Solutions - API Gestor de Veterinaria",
+  "version": "1.0.0",
+  "description": "API REST con autenticación JWT (HS256) y roles ADMIN / VETERINARIO.\n\n**Cómo probar:** 1) POST /api/login con admin/admin123, 2) copie el `token`, 3) botón **Authorize** y pegue solo el token. Los errores tienen siempre la forma {status, codigo, error, ruta}."
+ },
+ "servers": [
+  {
+   "url": "/veterinaria",
+   "description": "Contexto de la aplicación"
+  }
+ ],
+ "components": {
+  "securitySchemes": {
+   "bearerAuth": {
+    "type": "http",
+    "scheme": "bearer",
+    "bearerFormat": "JWT"
+   }
+  },
+  "schemas": {
+   "Error": {
+    "type": "object",
+    "properties": {
+     "status": {
+      "type": "integer",
+      "example": 400
+     },
+     "codigo": {
+      "type": "string",
+      "example": "VALIDACION"
+     },
+     "error": {
+      "type": "string",
+      "example": "El campo nombres es obligatorio"
+     },
+     "ruta": {
+      "type": "string",
+      "example": "/veterinaria/api/propietarios"
+     }
+    }
+   },
+   "LoginRequest": {
+    "type": "object",
+    "properties": {
+     "username": {
+      "type": "string",
+      "example": "admin",
+      "description": "Usuario o correo"
+     },
+     "password": {
+      "type": "string",
+      "example": "admin123"
+     }
+    },
+    "required": [
+     "username",
+     "password"
+    ]
+   },
+   "RegistroRequest": {
+    "type": "object",
+    "properties": {
+     "username": {
+      "type": "string"
+     },
+     "password": {
+      "type": "string",
+      "description": "Mín. 8 caracteres, letras y números"
+     },
+     "nombre": {
+      "type": "string"
+     },
+     "email": {
+      "type": "string",
+      "format": "email"
+     }
+    },
+    "required": [
+     "username",
+     "password",
+     "nombre",
+     "email"
+    ]
+   },
+   "Usuario": {
+    "type": "object",
+    "properties": {
+     "idUsuario": {
+      "type": "integer"
+     },
+     "username": {
+      "type": "string"
+     },
+     "nombre": {
+      "type": "string"
+     },
+     "email": {
+      "type": "string"
+     },
+     "estado": {
+      "type": "boolean"
+     },
+     "roles": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "UsuarioRequest": {
+    "type": "object",
+    "properties": {
+     "idUsuario": {
+      "type": "integer",
+      "description": "Solo en PUT"
+     },
+     "username": {
+      "type": "string"
+     },
+     "password": {
+      "type": "string",
+      "description": "Opcional en PUT"
+     },
+     "nombre": {
+      "type": "string"
+     },
+     "email": {
+      "type": "string"
+     },
+     "estado": {
+      "type": "boolean"
+     },
+     "roles": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "ADMIN",
+        "VETERINARIO"
+       ]
+      }
+     }
+    }
+   },
+   "Propietario": {
+    "type": "object",
+    "properties": {
+     "idPropietario": {
+      "type": "integer"
+     },
+     "tipoDocumento": {
+      "type": "string",
+      "enum": [
+       "CC",
+       "CE",
+       "TI",
+       "PA",
+       "NIT"
+      ]
+     },
+     "numeroDocumento": {
+      "type": "string"
+     },
+     "nombres": {
+      "type": "string"
+     },
+     "apellidos": {
+      "type": "string"
+     },
+     "telefono": {
+      "type": "string"
+     },
+     "email": {
+      "type": "string"
+     },
+     "direccion": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "tipoDocumento",
+     "numeroDocumento",
+     "nombres",
+     "apellidos"
+    ]
+   },
+   "MascotaRequest": {
+    "type": "object",
+    "properties": {
+     "idMascota": {
+      "type": "integer",
+      "description": "Solo en PUT"
+     },
+     "nombre": {
+      "type": "string"
+     },
+     "especie": {
+      "type": "string"
+     },
+     "raza": {
+      "type": "string"
+     },
+     "sexo": {
+      "type": "string",
+      "enum": [
+       "M",
+       "H"
+      ]
+     },
+     "fechaNacimiento": {
+      "type": "string",
+      "format": "date"
+     },
+     "color": {
+      "type": "string"
+     },
+     "pesoActual": {
+      "type": "number"
+     },
+     "esterilizado": {
+      "type": "boolean"
+     },
+     "propietario": {
+      "type": "object",
+      "properties": {
+       "idPropietario": {
+        "type": "integer"
+       }
+      }
+     }
+    },
+    "required": [
+     "nombre",
+     "especie",
+     "propietario"
+    ]
+   },
+   "Mascota": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "integer"
+     },
+     "nombre": {
+      "type": "string"
+     },
+     "especie": {
+      "type": "string"
+     },
+     "raza": {
+      "type": "string"
+     },
+     "sexo": {
+      "type": "string"
+     },
+     "fechaNacimiento": {
+      "type": "string",
+      "format": "date"
+     },
+     "color": {
+      "type": "string"
+     },
+     "pesoActual": {
+      "type": "number"
+     },
+     "estado": {
+      "type": "string",
+      "enum": [
+       "ACTIVO",
+       "INACTIVO"
+      ]
+     },
+     "idPropietario": {
+      "type": "integer"
+     },
+     "nombrePropietario": {
+      "type": "string"
+     }
+    }
+   },
+   "Veterinario": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "integer"
+     },
+     "tipoDocumento": {
+      "type": "string"
+     },
+     "numeroDocumento": {
+      "type": "string"
+     },
+     "nombres": {
+      "type": "string"
+     },
+     "apellidos": {
+      "type": "string"
+     },
+     "especialidad": {
+      "type": "string"
+     },
+     "telefono": {
+      "type": "string"
+     },
+     "email": {
+      "type": "string"
+     },
+     "estado": {
+      "type": "string",
+      "enum": [
+       "ACTIVO",
+       "INACTIVO"
+      ]
+     },
+     "idUsuario": {
+      "type": "integer"
+     }
+    },
+    "required": [
+     "tipoDocumento",
+     "numeroDocumento",
+     "nombres",
+     "apellidos"
+    ]
+   },
+   "Cita": {
+    "type": "object",
+    "properties": {
+     "idCita": {
+      "type": "integer"
+     },
+     "idMascota": {
+      "type": "integer"
+     },
+     "nombreMascota": {
+      "type": "string"
+     },
+     "idVeterinario": {
+      "type": "integer"
+     },
+     "nombreVeterinario": {
+      "type": "string"
+     },
+     "fechaHora": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-11-20T09:00:00"
+     },
+     "fechaFin": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "duracionMinutos": {
+      "type": "integer",
+      "example": 30
+     },
+     "motivo": {
+      "type": "string"
+     },
+     "estado": {
+      "type": "string",
+      "enum": [
+       "PROGRAMADA",
+       "ATENDIDA",
+       "CANCELADA"
+      ]
+     },
+     "observaciones": {
+      "type": "string"
+     },
+     "idHistorial": {
+      "type": "integer"
+     }
+    },
+    "required": [
+     "idMascota",
+     "idVeterinario",
+     "fechaHora"
+    ]
+   },
+   "CancelarCita": {
+    "type": "object",
+    "properties": {
+     "motivo": {
+      "type": "string"
+     }
+    }
+   },
+   "AtenderCita": {
+    "type": "object",
+    "properties": {
+     "diagnostico": {
+      "type": "string"
+     },
+     "observaciones": {
+      "type": "string"
+     },
+     "peso": {
+      "type": "number",
+      "example": 12.5
+     },
+     "temperatura": {
+      "type": "number",
+      "example": 38.5
+     }
+    }
+   },
+   "Historial": {
+    "type": "object",
+    "properties": {
+     "idHistorial": {
+      "type": "integer"
+     },
+     "idMascota": {
+      "type": "integer"
+     },
+     "idVeterinario": {
+      "type": "integer"
+     },
+     "fechaAtencion": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "motivoConsulta": {
+      "type": "string"
+     },
+     "diagnostico": {
+      "type": "string"
+     },
+     "observaciones": {
+      "type": "string"
+     },
+     "peso": {
+      "type": "number"
+     },
+     "temperatura": {
+      "type": "number",
+      "description": "°C, 30–45"
+     }
+    },
+    "required": [
+     "idMascota",
+     "motivoConsulta"
+    ]
+   },
+   "Tratamiento": {
+    "type": "object",
+    "properties": {
+     "idTratamiento": {
+      "type": "integer"
+     },
+     "idHistorial": {
+      "type": "integer"
+     },
+     "idMedicamento": {
+      "type": "integer"
+     },
+     "dosis": {
+      "type": "string"
+     },
+     "frecuencia": {
+      "type": "string"
+     },
+     "duracion": {
+      "type": "integer",
+      "description": "días"
+     },
+     "indicaciones": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "idHistorial",
+     "idMedicamento"
+    ]
+   },
+   "Vacunacion": {
+    "type": "object",
+    "properties": {
+     "idVacunacion": {
+      "type": "integer"
+     },
+     "idMascota": {
+      "type": "integer"
+     },
+     "idVacuna": {
+      "type": "integer"
+     },
+     "fechaAplicacion": {
+      "type": "string",
+      "format": "date"
+     },
+     "fechaProxima": {
+      "type": "string",
+      "format": "date"
+     },
+     "observaciones": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "idMascota",
+     "idVacuna",
+     "fechaAplicacion"
+    ]
+   },
+   "MascotaAlergia": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "integer"
+     },
+     "idMascota": {
+      "type": "integer"
+     },
+     "idAlergia": {
+      "type": "integer"
+     },
+     "observaciones": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "idMascota",
+     "idAlergia"
+    ]
+   },
+   "Catalogo": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "integer"
+     },
+     "nombre": {
+      "type": "string"
+     },
+     "descripcion": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "nombre"
+    ]
+   },
+   "Estadisticas": {
+    "type": "object",
+    "properties": {
+     "mascotas": {
+      "type": "integer"
+     },
+     "propietarios": {
+      "type": "integer"
+     },
+     "veterinarios": {
+      "type": "integer"
+     },
+     "citasProgramadas": {
+      "type": "integer"
+     },
+     "citasHoy": {
+      "type": "integer"
+     },
+     "vacunasPorVencer30Dias": {
+      "type": "integer"
+     }
+    }
+   }
+  }
+ },
+ "paths": {
+  "/api/login": {
+   "post": {
+    "tags": [
+     "Autenticación"
+    ],
+    "summary": "Iniciar sesión (RF-02)",
+    "description": "Roles permitidos: público",
+    "responses": {
+     "200": {
+      "description": "Token JWT",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "token": {
+           "type": "string"
+          },
+          "tipo": {
+           "type": "string",
+           "example": "Bearer"
+          },
+          "expiraEnSegundos": {
+           "type": "integer"
+          },
+          "usuario": {
+           "$ref": "#/components/schemas/Usuario"
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "429": {
+      "description": "Demasiados intentos fallidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Credenciales inválidas o cuenta inactiva",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/LoginRequest"
+       }
+      }
+     }
+    },
+    "security": []
+   }
+  },
+  "/api/registro": {
+   "post": {
+    "tags": [
+     "Autenticación"
+    ],
+    "summary": "Registro público (RF-01); crea VETERINARIO inactivo",
+    "description": "Roles permitidos: público",
+    "responses": {
+     "201": {
+      "description": "Registro recibido, pendiente de activación"
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "Usuario o correo ya existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RegistroRequest"
+       }
+      }
+     }
+    },
+    "security": []
+   }
+  },
+  "/api/logout": {
+   "post": {
+    "tags": [
+     "Autenticación"
+    ],
+    "summary": "Cerrar sesión y revocar el token (RF-12)",
+    "description": "Roles permitidos: cualquier usuario autenticado",
+    "responses": {
+     "200": {
+      "description": "Sesión cerrada"
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/me": {
+   "get": {
+    "tags": [
+     "Autenticación"
+    ],
+    "summary": "Perfil del usuario autenticado (RF-04, Home)",
+    "description": "Roles permitidos: cualquier usuario autenticado",
+    "responses": {
+     "200": {
+      "description": "Perfil con roles",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Usuario"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/estadisticas": {
+   "get": {
+    "tags": [
+     "Home"
+    ],
+    "summary": "Contadores para la pantalla Home",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Contadores",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Estadisticas"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/usuarios": {
+   "get": {
+    "tags": [
+     "Usuarios"
+    ],
+    "summary": "Listar o ver un usuario",
+    "description": "Roles permitidos: ADMIN",
+    "responses": {
+     "200": {
+      "description": "Usuarios",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/Usuario"
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "id",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "Si se envía, devuelve solo ese usuario"
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "post": {
+    "tags": [
+     "Usuarios"
+    ],
+    "summary": "Crear usuario con roles",
+    "description": "Roles permitidos: ADMIN",
+    "responses": {
+     "201": {
+      "description": "Creado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Usuario"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "Duplicado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/UsuarioRequest"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "put": {
+    "tags": [
+     "Usuarios"
+    ],
+    "summary": "Editar, activar/desactivar o cambiar roles",
+    "description": "Roles permitidos: ADMIN",
+    "responses": {
+     "200": {
+      "description": "Actualizado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Usuario"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "No existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/UsuarioRequest"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/roles": {
+   "get": {
+    "tags": [
+     "Usuarios"
+    ],
+    "summary": "Listar roles",
+    "description": "Roles permitidos: ADMIN",
+    "responses": {
+     "200": {
+      "description": "Roles"
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/propietarios": {
+   "get": {
+    "tags": [
+     "Propietarios"
+    ],
+    "summary": "Listar/buscar por 2 criterios (RF-09) o ver detalle (RF-10)",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Propietarios",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/Propietario"
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Texto en nombres/apellidos"
+     },
+     {
+      "name": "documento",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Número de documento"
+     },
+     {
+      "name": "id",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "Detalle"
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "post": {
+    "tags": [
+     "Propietarios"
+    ],
+    "summary": "Crear",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "201": {
+      "description": "Creado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Propietario"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "Documento duplicado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Propietario"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "put": {
+    "tags": [
+     "Propietarios"
+    ],
+    "summary": "Editar",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Actualizado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Propietario"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "No existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Propietario"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "delete": {
+    "tags": [
+     "Propietarios"
+    ],
+    "summary": "Eliminar (409 si tiene mascotas)",
+    "description": "Roles permitidos: ADMIN",
+    "responses": {
+     "204": {
+      "description": "Eliminado"
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "Tiene mascotas",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "id",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "Identificador del registro"
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/mascotas": {
+   "get": {
+    "tags": [
+     "Mascotas"
+    ],
+    "summary": "Listar/filtrar (RF-09) o detalle (RF-10)",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Mascotas",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/Mascota"
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Nombre"
+     },
+     {
+      "name": "especie",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      },
+      "description": ""
+     },
+     {
+      "name": "estado",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "enum": [
+        "ACTIVO",
+        "INACTIVO",
+        "TODOS"
+       ]
+      },
+      "description": "Por defecto solo ACTIVO"
+     },
+     {
+      "name": "idPropietario",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": ""
+     },
+     {
+      "name": "id",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "Detalle"
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "post": {
+    "tags": [
+     "Mascotas"
+    ],
+    "summary": "Crear",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "201": {
+      "description": "Creada",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Mascota"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Propietario no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/MascotaRequest"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "put": {
+    "tags": [
+     "Mascotas"
+    ],
+    "summary": "Editar",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Actualizada",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Mascota"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/MascotaRequest"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "delete": {
+    "tags": [
+     "Mascotas"
+    ],
+    "summary": "Desactivar (conserva la historia clínica)",
+    "description": "Roles permitidos: ADMIN",
+    "responses": {
+     "204": {
+      "description": "Desactivada"
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "id",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "Identificador del registro"
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/veterinarios": {
+   "get": {
+    "tags": [
+     "Veterinarios"
+    ],
+    "summary": "Listar/buscar o detalle",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Veterinarios",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/Veterinario"
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      },
+      "description": ""
+     },
+     {
+      "name": "estado",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "enum": [
+        "ACTIVO",
+        "INACTIVO",
+        "TODOS"
+       ]
+      },
+      "description": ""
+     },
+     {
+      "name": "id",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": ""
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "post": {
+    "tags": [
+     "Veterinarios"
+    ],
+    "summary": "Crear",
+    "description": "Roles permitidos: ADMIN",
+    "responses": {
+     "201": {
+      "description": "Creado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Veterinario"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Veterinario"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "put": {
+    "tags": [
+     "Veterinarios"
+    ],
+    "summary": "Editar",
+    "description": "Roles permitidos: ADMIN",
+    "responses": {
+     "200": {
+      "description": "Actualizado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Veterinario"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Veterinario"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "delete": {
+    "tags": [
+     "Veterinarios"
+    ],
+    "summary": "Desactivar",
+    "description": "Roles permitidos: ADMIN",
+    "responses": {
+     "204": {
+      "description": "Desactivado"
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "Tiene citas programadas",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "id",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "Identificador del registro"
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/citas": {
+   "get": {
+    "tags": [
+     "Citas"
+    ],
+    "summary": "Listar/filtrar citas (RF-09)",
+    "description": "Roles permitidos: ADMIN, VETERINARIO (el veterinario solo ve las suyas)",
+    "responses": {
+     "200": {
+      "description": "Citas",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/Cita"
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "estado",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "enum": [
+        "PROGRAMADA",
+        "ATENDIDA",
+        "CANCELADA"
+       ]
+      },
+      "description": ""
+     },
+     {
+      "name": "idVeterinario",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": ""
+     },
+     {
+      "name": "idMascota",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": ""
+     },
+     {
+      "name": "fecha",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      },
+      "description": "AAAA-MM-DD"
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "post": {
+    "tags": [
+     "Citas"
+    ],
+    "summary": "Agendar (valida cruces, pasado y activos)",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "201": {
+      "description": "Agendada",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Cita"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "Cruce de horario o regla de negocio",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Cita"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "put": {
+    "tags": [
+     "Citas"
+    ],
+    "summary": "Reprogramar/editar (solo PROGRAMADA)",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Actualizada",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Cita"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "Cita no editable",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Cita"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/citas/{id}": {
+   "get": {
+    "tags": [
+     "Citas"
+    ],
+    "summary": "Detalle de cita (RF-10)",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Cita",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Cita"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "No existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer"
+      }
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/citas/{id}/cancelar": {
+   "post": {
+    "tags": [
+     "Citas"
+    ],
+    "summary": "Cancelar cita PROGRAMADA",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Cancelada",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Cita"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "No está PROGRAMADA",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": false,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CancelarCita"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/citas/{id}/atender": {
+   "post": {
+    "tags": [
+     "Citas"
+    ],
+    "summary": "Atender: crea historial clínico (solo el día de la cita o después)",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Atendida",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Cita"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "Aún no es la fecha o estado inválido",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": false,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AtenderCita"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/historiales": {
+   "get": {
+    "tags": [
+     "Historia clínica"
+    ],
+    "summary": "Listar atenciones o detalle",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Atenciones",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/Historial"
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "idMascota",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": ""
+     },
+     {
+      "name": "idVeterinario",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": ""
+     },
+     {
+      "name": "id",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": ""
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "post": {
+    "tags": [
+     "Historia clínica"
+    ],
+    "summary": "Registrar atención",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "201": {
+      "description": "Creada",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Historial"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Historial"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "put": {
+    "tags": [
+     "Historia clínica"
+    ],
+    "summary": "Editar (un veterinario solo las suyas)",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Actualizada",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Historial"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Historial"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "delete": {
+    "tags": [
+     "Historia clínica"
+    ],
+    "summary": "Eliminar",
+    "description": "Roles permitidos: ADMIN",
+    "responses": {
+     "204": {
+      "description": "Eliminada"
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "id",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "Identificador del registro"
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/tratamientos": {
+   "get": {
+    "tags": [
+     "Historia clínica"
+    ],
+    "summary": "Listar por atención o detalle",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Tratamientos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/Tratamiento"
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "idHistorial",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": ""
+     },
+     {
+      "name": "id",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": ""
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "post": {
+    "tags": [
+     "Historia clínica"
+    ],
+    "summary": "Crear tratamiento",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "201": {
+      "description": "Creado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Tratamiento"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Tratamiento"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "put": {
+    "tags": [
+     "Historia clínica"
+    ],
+    "summary": "Editar tratamiento",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Actualizado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Tratamiento"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Tratamiento"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "delete": {
+    "tags": [
+     "Historia clínica"
+    ],
+    "summary": "Eliminar",
+    "description": "Roles permitidos: ADMIN",
+    "responses": {
+     "204": {
+      "description": "Eliminado"
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "id",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "Identificador del registro"
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/vacunaciones": {
+   "get": {
+    "tags": [
+     "Vacunación"
+    ],
+    "summary": "Carnet de vacunación",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Vacunaciones",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/Vacunacion"
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "idMascota",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": ""
+     },
+     {
+      "name": "proximasDias",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "Refuerzos que vencen en N días"
+     },
+     {
+      "name": "id",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": ""
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "post": {
+    "tags": [
+     "Vacunación"
+    ],
+    "summary": "Registrar vacunación",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "201": {
+      "description": "Creada",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Vacunacion"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Vacunacion"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "put": {
+    "tags": [
+     "Vacunación"
+    ],
+    "summary": "Editar",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Actualizada",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Vacunacion"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Vacunacion"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "delete": {
+    "tags": [
+     "Vacunación"
+    ],
+    "summary": "Eliminar",
+    "description": "Roles permitidos: ADMIN",
+    "responses": {
+     "204": {
+      "description": "Eliminada"
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "id",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "Identificador del registro"
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/mascota-alergias": {
+   "get": {
+    "tags": [
+     "Vacunación"
+    ],
+    "summary": "Antecedentes alérgicos de una mascota",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Alergias",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/MascotaAlergia"
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "idMascota",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": ""
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "post": {
+    "tags": [
+     "Vacunación"
+    ],
+    "summary": "Registrar alergia a una mascota",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "201": {
+      "description": "Creada",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/MascotaAlergia"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/MascotaAlergia"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "delete": {
+    "tags": [
+     "Vacunación"
+    ],
+    "summary": "Quitar",
+    "description": "Roles permitidos: ADMIN",
+    "responses": {
+     "204": {
+      "description": "Eliminada"
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "id",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "Identificador del registro"
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/vacunas": {
+   "get": {
+    "tags": [
+     "Catálogos"
+    ],
+    "summary": "Listar/buscar vacunas",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Registros",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/Catalogo"
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Texto en el nombre"
+     },
+     {
+      "name": "id",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": ""
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "post": {
+    "tags": [
+     "Catálogos"
+    ],
+    "summary": "Crear vacuna",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "201": {
+      "description": "Creado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Catalogo"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "Nombre repetido",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Catalogo"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "put": {
+    "tags": [
+     "Catálogos"
+    ],
+    "summary": "Editar vacuna",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Actualizado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Catalogo"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Catalogo"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "delete": {
+    "tags": [
+     "Catálogos"
+    ],
+    "summary": "Eliminar vacuna (409 si está en uso)",
+    "description": "Roles permitidos: ADMIN",
+    "responses": {
+     "204": {
+      "description": "Eliminado"
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "En uso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "id",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "Identificador del registro"
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/medicamentos": {
+   "get": {
+    "tags": [
+     "Catálogos"
+    ],
+    "summary": "Listar/buscar medicamentos",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Registros",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/Catalogo"
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Texto en el nombre"
+     },
+     {
+      "name": "id",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": ""
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "post": {
+    "tags": [
+     "Catálogos"
+    ],
+    "summary": "Crear medicamento",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "201": {
+      "description": "Creado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Catalogo"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "Nombre repetido",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Catalogo"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "put": {
+    "tags": [
+     "Catálogos"
+    ],
+    "summary": "Editar medicamento",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Actualizado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Catalogo"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Catalogo"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "delete": {
+    "tags": [
+     "Catálogos"
+    ],
+    "summary": "Eliminar medicamento (409 si está en uso)",
+    "description": "Roles permitidos: ADMIN",
+    "responses": {
+     "204": {
+      "description": "Eliminado"
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "En uso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "id",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "Identificador del registro"
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/alergias": {
+   "get": {
+    "tags": [
+     "Catálogos"
+    ],
+    "summary": "Listar/buscar alergias",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Registros",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/Catalogo"
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Texto en el nombre"
+     },
+     {
+      "name": "id",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": ""
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "post": {
+    "tags": [
+     "Catálogos"
+    ],
+    "summary": "Crear alergia",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "201": {
+      "description": "Creado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Catalogo"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "Nombre repetido",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Catalogo"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "put": {
+    "tags": [
+     "Catálogos"
+    ],
+    "summary": "Editar alergia",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Actualizado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Catalogo"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Catalogo"
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   },
+   "delete": {
+    "tags": [
+     "Catálogos"
+    ],
+    "summary": "Eliminar alergia (409 si está en uso)",
+    "description": "Roles permitidos: ADMIN",
+    "responses": {
+     "204": {
+      "description": "Eliminado"
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "En uso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "El registro (o uno referenciado) no existe",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "name": "id",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "Identificador del registro"
+     }
+    ],
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/export/mascotas/excel": {
+   "get": {
+    "tags": [
+     "Reportes"
+    ],
+    "summary": "Exportar mascotas a Excel",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Archivo",
+      "content": {
+       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+        "schema": {
+         "type": "string",
+         "format": "binary"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/export/mascotas/pdf": {
+   "get": {
+    "tags": [
+     "Reportes"
+    ],
+    "summary": "Exportar mascotas a PDF",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Archivo",
+      "content": {
+       "application/pdf": {
+        "schema": {
+         "type": "string",
+         "format": "binary"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/export/propietarios/excel": {
+   "get": {
+    "tags": [
+     "Reportes"
+    ],
+    "summary": "Exportar propietarios a Excel",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Archivo",
+      "content": {
+       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+        "schema": {
+         "type": "string",
+         "format": "binary"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/export/propietarios/pdf": {
+   "get": {
+    "tags": [
+     "Reportes"
+    ],
+    "summary": "Exportar propietarios a PDF",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Archivo",
+      "content": {
+       "application/pdf": {
+        "schema": {
+         "type": "string",
+         "format": "binary"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/export/veterinarios/excel": {
+   "get": {
+    "tags": [
+     "Reportes"
+    ],
+    "summary": "Exportar veterinarios a Excel",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Archivo",
+      "content": {
+       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+        "schema": {
+         "type": "string",
+         "format": "binary"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/export/veterinarios/pdf": {
+   "get": {
+    "tags": [
+     "Reportes"
+    ],
+    "summary": "Exportar veterinarios a PDF",
+    "description": "Roles permitidos: ADMIN, VETERINARIO",
+    "responses": {
+     "200": {
+      "description": "Archivo",
+      "content": {
+       "application/pdf": {
+        "schema": {
+         "type": "string",
+         "format": "binary"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/auditoria": {
+   "get": {
+    "tags": [
+     "Administración"
+    ],
+    "summary": "Registro de auditoría",
+    "description": "Roles permitidos: ADMIN",
+    "responses": {
+     "200": {
+      "description": "Eventos"
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  },
+  "/api/backup": {
+   "get": {
+    "tags": [
+     "Administración"
+    ],
+    "summary": "Descargar respaldo SQL (requiere mysqldump; ruta en variable BACKUP_MYSQLDUMP)",
+    "description": "Roles permitidos: ADMIN",
+    "responses": {
+     "200": {
+      "description": "Archivo",
+      "content": {
+       "application/sql": {
+        "schema": {
+         "type": "string",
+         "format": "binary"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Datos inválidos",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Token ausente, inválido, vencido o revocado",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Rol sin permiso",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "mysqldump no encontrado o falló",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ]
+   }
+  }
+ }
+}

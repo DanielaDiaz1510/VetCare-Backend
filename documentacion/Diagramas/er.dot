@@ -1,0 +1,27 @@
+digraph ER {
+  rankdir=LR; nodesep=0.35; ranksep=0.9; splines=true;
+  node [shape=plain fontname="Helvetica" fontsize=11];
+  edge [fontname="Helvetica" fontsize=9 arrowhead=crow arrowtail=none dir=both arrowtail=tee color="#555555"];
+  ROL [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="#e8eefc"><tr><td bgcolor="#2f4f8f"><font color="white"><b>rol</b></font></td></tr><tr><td align="left">idRol (PK)</td></tr><tr><td align="left">nombre (UQ)</td></tr></table>>];
+  USUARIO [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="#e8eefc"><tr><td bgcolor="#2f4f8f"><font color="white"><b>usuario</b></font></td></tr><tr><td align="left">idUsuario (PK)</td></tr><tr><td align="left">username (UQ)</td></tr><tr><td align="left">email (UQ)</td></tr><tr><td align="left">passwordHash (BCrypt)</td></tr><tr><td align="left">estado</td></tr></table>>];
+  USUARIO_ROL [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="#f4f4f4"><tr><td bgcolor="#777777"><font color="white"><b>usuario_rol</b></font></td></tr><tr><td align="left">id_usuario (FK)</td></tr><tr><td align="left">id_rol (FK)</td></tr></table>>];
+  VETERINARIO [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="#e8f6ec"><tr><td bgcolor="#2e7d4f"><font color="white"><b>veterinario</b></font></td></tr><tr><td align="left">idVeterinario (PK)</td></tr><tr><td align="left">documento (UQ)</td></tr><tr><td align="left">especialidad, estado</td></tr><tr><td align="left">id_usuario (FK, UQ)</td></tr></table>>];
+  PROPIETARIO [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="#e8f6ec"><tr><td bgcolor="#2e7d4f"><font color="white"><b>propietario</b></font></td></tr><tr><td align="left">idPropietario (PK)</td></tr><tr><td align="left">documento (UQ)</td></tr><tr><td align="left">nombres, apellidos, contacto</td></tr></table>>];
+  MASCOTA [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="#e8f6ec"><tr><td bgcolor="#2e7d4f"><font color="white"><b>mascota</b></font></td></tr><tr><td align="left">idMascota (PK)</td></tr><tr><td align="left">id_propietario (FK)</td></tr><tr><td align="left">nombre, especie, raza, sexo</td></tr><tr><td align="left">estado ACTIVO/INACTIVO</td></tr></table>>];
+  CITA [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="#fff4e0"><tr><td bgcolor="#c77700"><font color="white"><b>cita</b></font></td></tr><tr><td align="left">idCita (PK)</td></tr><tr><td align="left">id_mascota, id_veterinario (FK)</td></tr><tr><td align="left">fechaHora, duracionMinutos</td></tr><tr><td align="left">estado PROGRAMADA/ATENDIDA/CANCELADA</td></tr><tr><td align="left">id_historial (FK, nulo)</td></tr></table>>];
+  HISTORIAL [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="#fff4e0"><tr><td bgcolor="#c77700"><font color="white"><b>historial_clinico</b></font></td></tr><tr><td align="left">idHistorial (PK)</td></tr><tr><td align="left">id_mascota, id_veterinario (FK)</td></tr><tr><td align="left">diagnostico, peso, temperatura</td></tr></table>>];
+  TRATAMIENTO [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="#fff4e0"><tr><td bgcolor="#c77700"><font color="white"><b>tratamiento</b></font></td></tr><tr><td align="left">id_historial, id_medicamento (FK)</td></tr><tr><td align="left">dosis, frecuencia, duracion</td></tr></table>>];
+  MEDICAMENTO [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="#f3ecfa"><tr><td bgcolor="#6a3d9a"><font color="white"><b>medicamento</b></font></td></tr><tr><td align="left">nombre (UQ), tipo</td></tr></table>>];
+  VACUNACION [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="#fff4e0"><tr><td bgcolor="#c77700"><font color="white"><b>vacunacion</b></font></td></tr><tr><td align="left">id_mascota, id_vacuna (FK)</td></tr><tr><td align="left">fechaAplicacion, fechaProxima</td></tr></table>>];
+  VACUNA [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="#f3ecfa"><tr><td bgcolor="#6a3d9a"><font color="white"><b>vacuna</b></font></td></tr><tr><td align="left">nombre (UQ)</td></tr></table>>];
+  MASCOTA_ALERGIA [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="#fff4e0"><tr><td bgcolor="#c77700"><font color="white"><b>mascota_alergia</b></font></td></tr><tr><td align="left">id_mascota, id_alergia (UQ par)</td></tr></table>>];
+  ALERGIA [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3" bgcolor="#f3ecfa"><tr><td bgcolor="#6a3d9a"><font color="white"><b>alergia</b></font></td></tr><tr><td align="left">nombre (UQ)</td></tr></table>>];
+  ROL -> USUARIO_ROL; USUARIO -> USUARIO_ROL; USUARIO -> VETERINARIO [label="perfil 0..1"];
+  PROPIETARIO -> MASCOTA [label="posee"];
+  MASCOTA -> CITA [label="agenda"]; VETERINARIO -> CITA [label="atiende"];
+  MASCOTA -> HISTORIAL; VETERINARIO -> HISTORIAL [label="registra"];
+  HISTORIAL -> TRATAMIENTO; MEDICAMENTO -> TRATAMIENTO;
+  HISTORIAL -> CITA [label="origina al atender" style=dashed];
+  MASCOTA -> VACUNACION; VACUNA -> VACUNACION;
+  MASCOTA -> MASCOTA_ALERGIA; ALERGIA -> MASCOTA_ALERGIA;
+}

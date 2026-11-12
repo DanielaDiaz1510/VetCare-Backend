@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Veterinaria</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!-- Iconos -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Tipografía -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --azul-oscuro: #0f2a4a;
+            --azul: #2563eb;
+            --azul-claro: #38bdf8;
+        }
+
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            /* Degradado + huellitas (mismo fondo del dashboard) */
+            background-color: var(--azul-oscuro);
+            background-image:
+                linear-gradient(135deg, rgba(15, 42, 74, .96) 0%, rgba(30, 90, 142, .92) 55%, rgba(56, 189, 248, .85) 100%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='%23ffffff' fill-opacity='.9'%3E%3Cg transform='rotate(-20 40 40)'%3E%3Cellipse cx='40' cy='52' rx='13' ry='10'/%3E%3Cellipse cx='22' cy='35' rx='5' ry='7'/%3E%3Cellipse cx='34' cy='27' rx='5' ry='7'/%3E%3Cellipse cx='47' cy='27' rx='5' ry='7'/%3E%3Cellipse cx='58' cy='35' rx='5' ry='7'/%3E%3C/g%3E%3Cg transform='translate(80 80) rotate(25 40 40)'%3E%3Cellipse cx='40' cy='52' rx='13' ry='10'/%3E%3Cellipse cx='22' cy='35' rx='5' ry='7'/%3E%3Cellipse cx='34' cy='27' rx='5' ry='7'/%3E%3Cellipse cx='47' cy='27' rx='5' ry='7'/%3E%3Cellipse cx='58' cy='35' rx='5' ry='7'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            background-size: cover, 160px 160px;
+            background-attachment: fixed;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 410px;
+            border: 0;
+            border-radius: 22px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, .35);
+            overflow: hidden;
+            animation: subir .6s ease both;
+        }
+
+        .login-header {
+            text-align: center;
+            padding: 2rem 1.5rem 1.2rem;
+            background: #fff;
+        }
+
+        .login-logo {
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.1rem;
+            color: #fff;
+            background: linear-gradient(135deg, var(--azul), var(--azul-claro));
+            box-shadow: 0 10px 25px rgba(37, 99, 235, .4);
+        }
+
+        .login-header h1 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--azul-oscuro);
+            margin: 0;
+        }
+
+        .login-header p {
+            margin: .3rem 0 0;
+            font-size: .9rem;
+            color: #6b7280;
+        }
+
+        .login-body {
+            padding: 1rem 2rem 2rem;
+            background: #fff;
+        }
+
+        .form-label {
+            font-size: .85rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .input-group-text {
+            background: #f3f6fb;
+            border-right: 0;
+            color: var(--azul);
+            border-radius: 12px 0 0 12px;
+        }
+
+        .input-group .form-control {
+            border-left: 0;
+            border-radius: 0 12px 12px 0;
+            background: #f3f6fb;
+            padding: .65rem .85rem;
+        }
+
+        .input-group .form-control:focus {
+            box-shadow: none;
+            background: #fff;
+        }
+
+        .input-group:focus-within .input-group-text,
+        .input-group:focus-within .form-control {
+            border-color: var(--azul);
+            background: #fff;
+        }
+
+        .btn-ingresar {
+            border: 0;
+            border-radius: 12px;
+            padding: .75rem;
+            font-weight: 600;
+            letter-spacing: .3px;
+            background: linear-gradient(135deg, var(--azul), #1d4ed8);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, .35);
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+
+        .btn-ingresar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 26px rgba(37, 99, 235, .45);
+        }
+
+        /* Mensaje de error de auth.js (se oculta si está vacío) */
+        #error {
+            font-size: .88rem;
+            font-weight: 500;
+            min-height: 0;
+        }
+
+        #error:empty {
+            display: none;
+        }
+
+        .login-footer {
+            text-align: center;
+            font-size: .78rem;
+            color: #9ca3af;
+            margin-top: 1.4rem;
+        }
+
+        @keyframes subir {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card login-card">
+
+        <div class="login-header">
+            <div class="login-logo"><i class="bi bi-heart-pulse-fill"></i></div>
+            <h1>Plataforma Veterinaria</h1>
+            <p>Inicia sesión para continuar</p>
+        </div>
+
+        <div class="login-body">
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label" for="username">Usuario</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                        <input type="text" id="username" class="form-control" placeholder="Tu usuario" autocomplete="username" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label" for="password">Contraseña</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                        <input type="password" id="password" class="form-control" placeholder="••••••••" autocomplete="current-password" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-ingresar w-100">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Ingresar
+                </button>
+            </form>
+
+            <div id="error" class="alert alert-danger text-center mt-3 mb-0 py-2"></div>
+
+            <div class="login-footer">
+                <i class="bi bi-shield-check"></i> Acceso solo para personal autorizado
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>VetCare API - Swagger</title>
+<link rel="stylesheet" href="swagger-ui.css"><link rel="icon" href="favicon-32x32.png"></head>
+<body><div style="font-family:sans-serif;background:#fff8e1;border-bottom:1px solid #f0c36d;padding:10px 20px;font-size:14px;color:#5d4200">Documentación de la API de <b>VetCare</b>, por Daniela Díaz Falla. Aquí ves todos los endpoints; para ejecutarlos con «Try it out» hay que correr el backend en local (ver el <a href="https://github.com/DanielaDiaz1510/VetCare-Backend">README</a>).</div><div id="swagger-ui"></div>
+<script src="swagger-ui-bundle.js"></script><script src="swagger-ui-standalone-preset.js"></script>
+<script>
+window.onload=function(){
+  window.ui=SwaggerUIBundle({url:"openapi.json",dom_id:"#swagger-ui",deepLinking:true,
+    persistAuthorization:true,presets:[SwaggerUIBundle.presets.apis,SwaggerUIStandalonePreset],layout:"StandaloneLayout"});
+};
+</script></body></html>
